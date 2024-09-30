@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lựa chọn dịch vụ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-top: 150px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 450px;
+            height: 500px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center; /* Căn giữa các phần tử ngang */
+        }
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .dropdown {
+            width: 100%; /* Đặt chiều rộng của phần tử dropdown */
+            margin-bottom: 20px;
+        }
+        .dropdown label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .dropdown select {
+            width: 100%; /* Đảm bảo phần tử select chiếm toàn bộ chiều rộng của phần tử cha */
+            padding: 12px; /* Tăng padding để chiều cao lớn hơn */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px; /* Tăng kích thước font để thanh chọn dài hơn */
+        }
+        .container img {
+            width: 95%; /* Điều chỉnh kích thước của hình ảnh */
+            height: auto;
+            max-width: 500px; /* Đặt kích thước tối đa để hình ảnh không quá lớn */
+            border-radius: 8px;
+        }
+    </style>
+    <script>
+        function navigateToPage(selectElement) {
+            const value = selectElement.value;
+            if (value) {
+                window.location.href = value;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="image-container">
+            <img src="PVA.png" alt="Phongvanao">
+        </div>
+        <div class="dropdown">
+            <label for="dropdown1">Lựa chọn gói dịch vụ</label>
+            <select id="dropdown1" name="dropdown1" onchange="navigateToPage(this)">
+                <option value="###">Lựa chọn </option>
+                <option value="ai.html">AI thường</option>
+                <option value="aivip.html">AI VIP</option>
+            </select>
+        </div>
+        <div class="dropdown">
+            <label for="dropdown1">Lựa chọn gói dịch vụ NTD</label>
+            <select id="dropdown1" name="dropdown1" onchange="navigateToPage(this)">
+                <option value="#">ĐANG UPDATE </option>
+                <option value="#">ĐANG UPDATE </option>
+            </select>
+        </div>
+    </div>
+</body>
+</html>

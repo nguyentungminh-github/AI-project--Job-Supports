@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechFuture Visual Interview</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        #chat-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #chat-output {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            margin-bottom: 10px;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            margin-left: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #speech-control {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        #speech-rate {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1><img src="logo.png" alt="Logo"> TECHFUTURE VISUAL INTERVIEW </h1>
+    <div id="chat-container">
+        <div id="chat-output"></div>
+        <div style="display: flex;">
+            <input type="text" id="chat-input" placeholder="Nhập tin nhắn tới TechFuture AI..." />
+            <button id="send-button"><span class="material-symbols-outlined">Send</span></button>
+            <button id="clear-button"> Clear Chat</button>
+            <button id="speech-button"><span class="material-symbols-outlined">Mic</span></button>
+        </div>
+        <div id="speech-control">
+            <label for="speech-rate"><span class="material-symbols-outlined">speed</span></label>
+            <input type="range" id="speech-rate" min="0.5" max="3.0" step="0.1" value="1">
+            <span id="rate-display">1.0</span>
+        </div>
+    </div>
+
+    <script>
+        // Update the rate display on input change
+        document.getElementById("speech-rate").addEventListener("input", function() {
+            document.getElementById("rate-display").textContent = this.value;
+        });
+
+        // Example event listeners for buttons (implement functionality as needed)
+        document.getElementById("send-button").onclick = function() {
+            const input = document.getElementById("chat-input");
+            const message = input.value;
+            if (message) {
+                document.getElementById("chat-output").innerText += `You: ${message}\n`;
+                input.value = ''; // Clear input
+            }
+        };
+
+        document.getElementById("clear-button").onclick = function() {
+            document.getElementById("chat-output").innerText = '';
+        };
+
+        // Add speech recognition functionality here if desired
+    </script>
+</body>
+</html>

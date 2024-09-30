@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechFuture AI - Phỏng vấn ảo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Basic Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    /* Body Style */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+  
+    /* Header Style */
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      color: #36b8ff;
+      display: flex;
+      height: auto;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+    }
+  
+    h1 img {
+      width: 50px; /* Adjust the size of the logo */
+      height: auto;
+      margin-right: 10px; /* Space between the logo and the text */
+    }
+  
+    /* Chat Container */
+    #chat-container {
+      width: 95%;
+      height: 100%;
+      max-height: 2000px !important;
+      max-width: 1500px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+  
+    /* Chat Output */
+    #chat-output {
+      height: 600px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 20px;
+      background: #f9f9f9;
+      margin-bottom: 10px;
+    }
+  
+    /* Chat Input and Buttons */
+    #chat-input {
+      width: calc(100% - 200px); /* Adjusted for speech-to-text button */
+      padding: 15px;
+      border: 1px solid #ddd;
+      margin-right: 10px;
+    }
+  
+    #send-button, #clear-button, #speech-button , #speech-rate {
+      padding: 15px 25px;
+      border: none;
+      background: #36b8ff;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+  
+    #send-button:hover, #clear-button:hover, #speech-button:hover {
+      background: #1f8fef;
+    }
+  
+    /* Chat Messages */
+    #chat-output p {
+      margin: 10px 0;
+      padding: 10px;
+    }
+  
+    #chat-output p.user-message {
+      text-align: right;
+      background: #36b8ff;
+      color: #fff;
+    }
+  
+    #chat-output p.ai-message {
+      text-align: left;
+      background: #e9ecef;
+      color: #333;
+    }
+  
+    #chat-output p.thinking {
+      text-align: left;
+      background: #f0f0f0;
+      color: #888;
+      font-style: italic;
+    }
+       /* Speech rate control */
+       #speech-control {
+      display: flex;
+      margin-left: 20px;
+      padding: 15px 25px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    #speech-control label {
+      margin-right: 10px;
+    }
+
+    #speech-control input[type="range"] {
+      width: 150px;
+    }
+    #speech-rate {
+      color :#fff
+    }
+  </style>
+</head>
+<body>
+  <h1><img src="logo.png" alt="Logo"> TECHFUTURE VISUAL INTERVIEW </h1>
+  <div id="chat-container">
+    <div id="chat-output"></div>
+    <div style="display: flex;">
+      <input type="text"id="chat-input" placeholder="Nhập tin nhắn tới TechFuture AI..." />
+      <button id="send-button"><span class="material-symbols-outlined">Send</span></button>
+      <button id="clear-button"> Clear Chat</button>
+      <button id="speech-button"><span class="material-symbols-outlined">Mic</span></button>
+      <div id="speech-control">
+        <label for="speech-rate"><span class="material-symbols-outlined">speed</span></label>
+        <input type="range" id="speech-rate" min="0.5" max="3.0" step="0.1" value="1">
+        <span id="rate-display"></span>
+      </div>
+    </div>
+    </div>
+  </div>
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
+  </script>
+  <script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
+
+    const API_KEY = "AIzaSyA9Z-KPldwSJZt9Xv89xL4br52E8Ot30P4"; // Example key
+    const genAI = new GoogleGenerativeAI(API_KEY);
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: "Bạn là AI hỗ trợ phỏng vấn , Câu giới thiệu của bạn sẽ là : Chào mừng đến phòng phỏng vấn ảo ! Hãy cung cấp tên và ngành nghề - công ty sẽ phỏng vấn và tôi sẽ hỗ trợ bạn luyện tập trả lời phỏng vấn cũng như tôi sẽ đưa các feedback cho câu trả lời của bạt , bắt đầu nào!",
+      prompt :"Nếu người dùng hỏi về các ngành liên quan đến CNTT  như : AI , Phần mềm , Quản trị mạng hãy đưa ra các câu hỏi như sau +) Bạn có thể cho tôi biết 1 chút về cấu trúc của mạng nơ ron ",
+    });
+
+    const generationConfig = {
+      temperature: 1,
+      topP: 0.95,
+      topK: 64,
+      maxOutputTokens: 8192,
+      responseMimeType: "text/plain",
+    };
+
+    // Hàm chuyển văn bản thành âm thanh
+    function textToSpeech(text) {
+      const synth = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
+      // Cài đặt giọng đọc tiếng Việt (nếu có)
+      const voices = synth.getVoices();
+      const VietnameseVoice = voices.find(voice => voice.lang === 'vi-VN');
+
+      if (VietnameseVoice) {
+        utterance.voice = VietnameseVoice;
+      }
+      // Lấy giá trị tốc độ từ slider
+      const speechRate = document.getElementById('speech-rate').value;
+      utterance.rate = speechRate;
+
+      synth.speak(utterance);
+    }
+
+    // Hàm thực thi để bắt đầu phiên trò chuyện
+    async function run(userMessage) {
+      const chatSession = model.startChat({
+        generationConfig,
+        history: [
+          {
+            role: "user",
+            parts: [
+              {text: "xin chào\n"},
+            ],
+          },
+          {
+            role: "model",
+            parts: [
+              {text: "Xin chào bạn! Chào mừng đến phòng phỏng vấn ảo vui lòng cung cấp thông tin cá nhân và chúng ta  bắt đầu buổi phỏng vấn "},
+            ],
+          },
+          {
+            role: "user",
+            parts: [
+              {text: "Tôi là *** , Tôi sinh năm ***  , Tôi muốn ứng tuyển ***  , Tôi muốn làm tại *** "},
+            ],
+          },
+          {
+            role: "model",
+            parts: [
+              {text: "Tuyệt vời! Cảm ơn bạn đã bỏ thời gian đến đây phỏng vấn , tôi sẽ đưa cho bạn 1 số hệ thống câu hỏi liên quan đến vị trí mà bạn đã ứng tuyển hãy trả lời và tôi sẽ đưa ra feedback cũng như chấm điểm cho bạn"},
+            ],
+          },
+          {
+            role: "user",
+            parts: [
+              {text: "Sẵn sàng phỏng vấn hãy bắt đầu "},
+            ],
+          },
+          {
+            role: "model",
+            parts: [
+              {text: "Tuyệt vời ! chúng ta sẽ bắt đầu câu hỏi đầu tiên : *********"},
+            ],
+          },
+          {
+            role: "user",
+            parts: [
+              {text: "***Câu trả lời của người dùng ***"},
+            ],
+          },
+          {
+            role: "model",
+            parts: [
+              {text: "Tuyệt câu trả lời của bạn sẽ được tôi nhận xét như sau : "},
+            ],
+          },
+        ],
+      });
+
+      const result = await chatSession.sendMessage(userMessage);
+      return result.response.text(); // Return the response text from AI
+    }
+
+    async function sendMessage() {
+      const chatInput = document.getElementById('chat-input');
+      const chatOutput = document.getElementById('chat-output');
+      const msg = chatInput.value.trim();
+
+      if (!msg) return; // Prevent sending empty messages
+
+      // Create and append user message
+      const userMessage = document.createElement('p');
+      userMessage.textContent = `${msg}`;
+      userMessage.classList.add('user-message');
+      chatOutput.appendChild(userMessage);
+
+      // Create and append "Thinking..." message
+      const thinkingMessage = document.createElement('p');
+      thinkingMessage.textContent = 'AI: Đang suy nghĩ vui lòng đợi ...';
+      thinkingMessage.classList.add('thinking');
+      chatOutput.appendChild(thinkingMessage);
+
+      // Clear input field after sending
+      chatInput.value = '';
+
+      // Scroll to the bottom
+      chatOutput.scrollTop = chatOutput.scrollHeight;
+
+      try {
+        // Call the `run` function to get AI's response
+        const aiResponse = await run(msg);
+
+        // Replace "Thinking..." message with AI response
+        setTimeout(() => {
+          chatOutput.removeChild(thinkingMessage);
+
+          const aiMessage = document.createElement('p');
+          aiMessage.textContent = `AI: ${aiResponse}`;
+          aiMessage.classList.add('ai-message');
+          chatOutput.appendChild(aiMessage);
+
+          // Chuyển phản hồi của AI thành âm thanh
+          textToSpeech(aiResponse);
+
+          // Scroll to the bottom
+          chatOutput.scrollTop = chatOutput.scrollHeight;
+        }, 1000); // 1 second delay
+
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    }
+
+    function clearChat() {
+      const chatOutput = document.getElementById('chat-output');
+      chatOutput.innerHTML = ''; // Clear all chat messages
+    }
+
+    function sendWelcomeMessage() {
+      const chatOutput = document.getElementById('chat-output');
+      const welcomeMessage = document.createElement('p');
+      welcomeMessage.textContent = 'AI: Chào mừng đến phòng phỏng vấn ảo ';
+      welcomeMessage.classList.add('ai-message');
+      chatOutput.appendChild(welcomeMessage);
+      chatOutput.scrollTop = chatOutput.scrollHeight;
+    }
+
+    // Hàm để nhận diện giọng nói và gửi tin nhắn
+    function startSpeechRecognition() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'vi-VN'; // Đặt ngôn ngữ nhận diện là tiếng Việt
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        const chatInput = document.getElementById('chat-input');
+        chatInput.value = transcript;
+        await sendMessage();
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+      };
+
+      recognition.start();
+    }
+// Gọi hàm để nhận diện giọng nói và gửi tin nhắn
+
+    window.addEventListener('load', sendWelcomeMessage);
+    document.getElementById('send-button').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+    document.getElementById('clear-button').addEventListener('click', clearChat);
+    document.getElementById('speech-button').addEventListener('click', startSpeechRecognition);
+  </script>
+</body>
+</html>
+<script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/0.1.0-beta.5/libs/oversea/index.js"></script>
+      <script>
+          new CozeWebSDK.WebChatClient({
+            config: {
+              bot_id: '7389470992751689736',
+            },
+            componentProps: {
+              title: 'Coze',
+            },
+          });
+      </script>
